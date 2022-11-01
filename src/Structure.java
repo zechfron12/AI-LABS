@@ -1,15 +1,16 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 public class Structure {
     String file;
-    String playerAName;
-    String playerBName;
+    Player playerA;
+    Player playerB;
     HashMap<Pair<String, String>, Pair<Integer, Integer>> movesValues = new HashMap<>();
-    List<String> playerAMoves = new ArrayList<>() ;
-    List<String> playerBMoves = new ArrayList<>() ;
+    HashMap<Pair<String, String>, Pair<Integer, Integer>> reversedMovesValues = new HashMap<>();
 
     public Structure(String file) {
         this.file = file;
@@ -18,10 +19,9 @@ public class Structure {
 
     private void initFromFile() {
         String data;
-        Pattern pattern2 = Pattern.compile("[0-9]+");
-        Pattern pattern1 = Pattern.compile("[0-9]+/[0-9]+");
+        Pattern pattern1 = Pattern.compile("\\d+/\\d+");
         Matcher matcher;
-        Matcher matcher2;        int line = 0;
+        int line = 0;
         try {
             File myObj = new File(file);
             Scanner myReader = new Scanner(myObj);
@@ -32,41 +32,35 @@ public class Structure {
                 matcher = pattern1.matcher(data);
                 String[] words = data.split(" ");
 
-                if(line == 1) {
-                    playerAName = words[0];
+                if (line == 1) {
+                    playerA = new Player(words[0]);
 
-                    for (int i = 1; i < words.length; i++) {
-                        playerAMoves.add(words[i]);
-                    }
-                }
-                else
-                if(line == 2) {
-                    playerBName = words[0];
-                    for (int i = 1; i < words.length; i++) {
-                        playerBMoves.add(words[i]);
-                    }
+                    playerA.moves.addAll(Arrays.asList(words).subList(1, words.length));
+                } else if (line == 2) {
+                    playerB = new Player(words[0]);
+                    playerB.moves.addAll(Arrays.asList(words).subList(1, words.length));
                 } else {
-                    int AIndex = line - 3;
-                    String AMoveName = playerAMoves.get(AIndex);
-                    int Bindex = 0;
+                    int aIndex = line - 3;
+                    String aMoveName = playerA.moves.get(aIndex);
+                    int bIndex = 0;
                     while (matcher.find()) {
                         String numbers = matcher.group();
 
                         String[] numberArray = numbers.split("/");
-                        int AMoveValue = Integer.parseInt(numberArray[0]);
-                        int BMoveValue = Integer.parseInt(numberArray[1]);
-                        String BMoveName = playerBMoves.get(Bindex);
+                        int aMoveValue = Integer.parseInt(numberArray[0]);
+                        int bMoveValue = Integer.parseInt(numberArray[1]);
+                        String bMoveName = playerB.moves.get(bIndex);
 
-                        movesValues.put(new Pair<>(AMoveName, BMoveName), new Pair<>(AMoveValue, BMoveValue));
-                        Bindex++;
+                        movesValues.put(new Pair<>(aMoveName, bMoveName), new Pair<>(aMoveValue, bMoveValue));
+                        reversedMovesValues.put(new Pair<>(bMoveName, aMoveName), new Pair<>(bMoveValue, aMoveValue));
+                        bIndex++;
                     }
                 }
-
-
-
             }
 
-            System.out.println(movesValues);
+            playerA.setMovesMap(movesValues);
+            playerB.setMovesMap(reversedMovesValues);
+
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
