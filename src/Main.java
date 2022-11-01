@@ -1,6 +1,5 @@
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class Main {
 
@@ -22,10 +21,15 @@ public class Main {
         Structure s = new Structure("src/input.txt");
         Player playerA = s.playerA;
         Player playerB = s.playerB;
-
+        System.out.println("➖➖➖➖➖➖➖➖➖➖➖➖➖");
+        System.out.println(playerA.name+ "'s" + " dominant strategy: ");
         System.out.println(playerA.findDominantStrategy(playerB));
+        System.out.println("➖➖➖➖➖➖➖➖➖➖➖➖➖");
+        System.out.println(playerB.name+ "'s" + " dominant strategy: ");
         System.out.println(playerB.findDominantStrategy(playerA));
+        System.out.println("➖➖➖➖➖➖➖➖➖➖➖➖➖");
+        System.out.println("Nash Equilibra:");
         System.out.println(findNashEquilibra(playerA, playerB));
-
+        System.out.println("➖➖➖➖➖➖➖➖➖➖➖➖➖");
     }
 }
