@@ -6,12 +6,6 @@ public class Player {
     List<String> moves;
     Map<Pair<String, String>, Pair<Integer, Integer>> movesMap;
 
-    public Player(String name, List<String> moves, Map<Pair<String, String>, Pair<Integer, Integer>> movesMap) {
-        this.name = name;
-        this.moves = moves;
-        this.movesMap = movesMap;
-    }
-
     public Player(String name) {
         this.name = name;
         this.moves = new ArrayList<>();
@@ -54,12 +48,4 @@ public class Player {
         });
         return dominantStrategy;
     }
-
-    public Pair<Integer, Integer> getExistentMove(Map<Pair<String, String>, Pair<Integer, Integer>> movesValues, String first, String second) {
-        if (movesValues.get(new Pair<>(first, second)) != null)
-            return movesValues.get(new Pair<>(first, second));
-        return movesValues.get(new Pair<>(second, first));
-    }
-
-
 }

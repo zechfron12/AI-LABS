@@ -1,4 +1,3 @@
-import java.util.HashSet;
 import java.util.Objects;
 
 class Pair<T, S> {
@@ -9,10 +8,6 @@ class Pair<T, S> {
     Pair(T first, S second) {
         this.first = first;
         this.second = second;
-    }
-
-    Pair values() {
-        return new Pair(first, second);
     }
 
     @Override
