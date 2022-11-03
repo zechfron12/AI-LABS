@@ -1,57 +1,67 @@
-import random
+# Implement the Backpropagation algorithm for a multilayer neural network (with one hidden layer) to classify numerical data
 
-file_path = open('iris.data', 'r')
-
-
-def read_file(file_path):
-    rows = []
-    for line in file_path:
-        rows.append(line[:-1])
-    return rows
+# Import the necessary libraries
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
 
 
-def get_data(train_data):
-    data = []
-    for row in train_data:
-        data.append(row.split(','))
-    return data
+# Define the sigmoid function
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
 
-def format_data(data):
-    data_set = []
-    for row in data:
-        temp = []
-        for i in range(len(row) - 1):
-            temp.append(float(row[i]))
-        data_set.append((temp, row[-1]))
-    return data_set[:-1]
+# Define the derivative of the sigmoid function
+def sigmoid_derivative(x):
+    return x * (1 - x)
 
 
-# write a method that separtes shuffled data into 2 sets
-def separate_data(data_set):
-    random.shuffle(data_set)
-    train_set = data_set[:int(len(data_set) * 0.8)]
-    test_set = data_set[int(len(data_set) * 0.8):]
-    return train_set, test_set
+# Define the input data
+data = pd.read_csv("data.csv")
 
-def main():
-    data = read_file(file_path)
-    data = get_data(data)
-    data_set = format_data(data)
-    train_set, test_set = separate_data(data_set)
-    print("Train set: ", len(train_set))
-    print(train_set)
-    print("Test set: ", len(test_set))
-    print(test_set)
+# Define the input and output features
+X = data.drop("class", axis=1)
+y = data["class"]
 
-    input_layer = [0] * 4
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    hidden_layer_weight = [[0] * 4] * 100
-    output_layer_weight = [[0] * 100] * 3
+# Scale the data
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-    hidden_layer_bias = [0] * 100
-    output_layer_bias = [0] * 3
+# Define the number of input features, hidden units, and output units
+input_features = X_train.shape[1]
+hidden_units = 3
+output_units = 1
 
-    learning_rate = 0.1
+# Initialize the model parameters
+weights_input_hidden = np.random.uniform(size=(input_features, hidden_units))
+bias_input_hidden = np.zeros(hidden_units)
+weights_hidden_output = np.random.uniform(size=(hidden_units, output_units))
+bias_hidden_output = np.zeros(output_units)
 
-main()
+# Define the number of epochs and learning rate
+epochs = 1000
+learning_rate = 0.1
+
+# Train the model
+for epoch in range(epochs):
+    # Feedforward pass
+    hidden_layer_input = np.dot(X_train, weights_input_hidden) + bias_input_hidden
+    hidden_layer_activations = sigmoid(hidden_layer_input)
+    output_layer_input = np.dot(hidden_layer_activations, weights_hidden_output) + bias_hidden_output
+    output = sigmoid(output_layer_input)
+
+    # Backpropagation
+    error = y_train - output
+    d_output = error * sigmoid_derivative(output)
+    error_hidden_layer = d_output.dot(weights_hidden_output.T)
+    d_hidden_layer = error_hidden_layer * sigmoid_derivative(hidden_layer_activations)
+    weights_hidden_output += hidden_layer_activations.T.dot(d_output) * learning_rate
+    bias_hidden_output += np.sum(d_output, axis=0, keepdims=True) * learning_rate
+    weights_input_hidden += X_train.T.dot(d_hidden_layer) * learning_rate
+    bias_input_hidden
